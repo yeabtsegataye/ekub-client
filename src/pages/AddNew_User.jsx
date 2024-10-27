@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useToast } from "@chakra-ui/react"; // Using Chakra UI's toast for notifications
+import { useSelector } from "react-redux";
 
 const API = import.meta.env.VITE_API_URL; // Replace with your actual API URL
 
@@ -15,6 +16,7 @@ export const AddUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const toast = useToast();
+  const token = useSelector((state) => state.auth.token);
 
   // Helper function to capitalize the first letter of a string
   const capitalize = (text) => {
@@ -48,8 +50,11 @@ export const AddUser = () => {
     try {
       const response = await fetch(`${API}/customers/add`, {
         method: "POST",
+        credentials: "include", // This enables cookies to be sent with the request
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+
         },
         body: JSON.stringify(capitalizedData), // Use the capitalized data here
       });

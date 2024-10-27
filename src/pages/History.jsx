@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 const API = import.meta.env.VITE_API_URL;
 
 export const History = () => {
   // State to store fetched data
   const [historyData, setHistoryData] = useState([]);
-  
+  const token = useSelector((state) => state.auth.token);
+
   // Fetch data from API when component mounts
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await axios.get(`${API}/categoray/history`);
+        const response = await axios.get(`${API}/categoray/history`, {
+          withCredentials: true, // Enable cookies to be sent with the request
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Replace 'token' with your actual access token variable
+          },
+         });
         setHistoryData(response.data);  // Set data to state
       } catch (error) {
         console.error("Error fetching history data:", error);

@@ -12,6 +12,7 @@ import {
   AlertDialogOverlay,
   Input,
 } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
 const API = import.meta.env.VITE_API_URL;
 
 export const Categorays = () => {
@@ -24,6 +25,7 @@ export const Categorays = () => {
   const startDate = queryParams.get("start"); // Extract start date
   const endDate = queryParams.get("end"); // Extract end date
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const token = useSelector((state) => state.auth.token);
 
   const [days, setDays] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,15 @@ export const Categorays = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${API}/dates/get/${id}`); // Adjust the URL to your API
+        const response = await fetch(`${API}/dates/get/${id}`,{
+          method: "GET",
+          credentials: "include", // This enables cookies to be sent with the request
+          headers: {
+            "Content-Type": "application/json",
+            // Optionally, include the Authorization header if you need the access token
+            Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+          },
+        }); // Adjust the URL to your API
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -62,7 +72,15 @@ export const Categorays = () => {
 
   const fetchAllUsers = async () => {
     try {
-      const response = await fetch(`${API}/customers/get`); // Adjust the URL to your API
+      const response = await fetch(`${API}/customers/get`,{
+        method: "GET",
+        credentials: "include", // This enables cookies to be sent with the request
+        headers: {
+          "Content-Type": "application/json",
+          // Optionally, include the Authorization header if you need the access token
+          Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+        },
+      }); // Adjust the URL to your API
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
@@ -101,8 +119,11 @@ export const Categorays = () => {
     try {
       const response = await fetch(`${API}/dates/addUsers`, {
         method: "PATCH",
+        credentials: "include", // This enables cookies to be sent with the request
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+
         },
         body: JSON.stringify({
           categoryId: id,
@@ -215,8 +236,11 @@ export const Categorays = () => {
         console.log(newPaymentsData, "new");
         const newResponse = await fetch(`${API}/dates/add`, {
           method: "POST",
+          credentials: "include", // This enables cookies to be sent with the request
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+
           },
           body: JSON.stringify(newPaymentsData),
         });
@@ -234,8 +258,10 @@ export const Categorays = () => {
           `${API}/dates/update`,
           {
             method: "PATCH",
+            credentials: "include", // This enables cookies to be sent with the request
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
             },
             body: JSON.stringify(updatedPaymentsData),
           }
@@ -260,8 +286,10 @@ export const Categorays = () => {
         `${API}/categoray/update/${id}`,
         {
           method: "PATCH",
+          credentials: "include", // This enables cookies to be sent with the request
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
           },
           body: JSON.stringify({
             IsCompleted: true, // Set isCompleted to true

@@ -16,10 +16,12 @@ import {
   TagLabel,
   TagCloseButton,
 } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
 const API = import.meta.env.VITE_API_URL;
 
 export const Newekub = () => {
   // State to handle form input values
+  const token = useSelector((state) => state.auth.token);
   const [amount, setAmount] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -31,7 +33,15 @@ export const Newekub = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch(`${API}/customers/get`);
+        const response = await fetch(`${API}/customers/get`,{
+          method: "GET",
+          credentials: "include", // This enables cookies to be sent with the request
+          headers: {
+            "Content-Type": "application/json",
+            // Optionally, include the Authorization header if you need the access token
+            Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+          },
+        });
         const data = await response.json();
         setCustomers(data); // Assuming the response is an array of customers
       } catch (error) {
@@ -64,8 +74,11 @@ export const Newekub = () => {
       // Make a POST request to the backend API
       const response = await fetch(`${API}/categoray/add`, {
         method: "POST",
+        credentials: "include", // This enables cookies to be sent with the request
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+
         },
         body: JSON.stringify(newEkub),
       });
@@ -148,7 +161,7 @@ export const Newekub = () => {
         {/* Selected Members Display */}
         <Box mb={4}>
           <FormLabel>አባላትን መምረጫ ክፍል:</FormLabel>
-          {selectedMembers.map((member) => (
+          {selectedMembers && selectedMembers.map((member) => (
             <Tag size="md" key={member.id} mr={2} mb={2} colorScheme="green">
               <TagLabel>{member.Name}</TagLabel>
               <TagCloseButton
@@ -169,7 +182,7 @@ export const Newekub = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {customers.map((customer) => (
+            {customers ? customers?.map((customer) => (
               <Tr key={customer.id}>
                 <Td>{customer.Name}</Td>
                 <Td>{customer.Phone}</Td>
@@ -189,7 +202,7 @@ export const Newekub = () => {
                   </Button>
                 </Td>
               </Tr>
-            ))}
+            )): ''}
           </Tbody>
         </Table>
 

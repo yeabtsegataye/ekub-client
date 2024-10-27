@@ -28,7 +28,8 @@ function App() {
     if (isInitialLoad) {
       refresh();
       setIsInitialLoad(false);
-    }
+    } 
+    verified();
   }, [isInitialLoad, refresh]);
 
   const token = useSelector((state) => state.auth.token);
@@ -38,7 +39,7 @@ function App() {
     setIsVerified(Is_Verified);
      console.log(isVerified, 'for loging in')
   };
-  verified();
+ 
 
   // console.log("isverified : ", isVerified);
 

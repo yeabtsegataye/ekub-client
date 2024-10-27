@@ -1,16 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
-import { 
-  Spinner, 
-  useToast, 
-  Button, 
-  AlertDialog, 
-  AlertDialogBody, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogContent, 
-  AlertDialogOverlay, 
-  Input 
+import {
+  Spinner,
+  useToast,
+  Button,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Input,
 } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -24,11 +25,20 @@ export const AllUsers = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const cancelRef = useRef();
   const toast = useToast();
+  const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${API}/customers/get`);
+        const response = await fetch(`${API}/customers/get`, {
+          method: "GET",
+          credentials: "include", // This enables cookies to be sent with the request
+          headers: {
+            "Content-Type": "application/json",
+            // Optionally, include the Authorization header if you need the access token
+            Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+          },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch users data.");
         }
@@ -53,8 +63,16 @@ export const AllUsers = () => {
 
   const handleDelete = async () => {
     try {
-      await fetch(`${API}/customers/delete/${deletingUser.id}`, { method: 'DELETE' });
-      setUsers(users.filter(user => user.id !== deletingUser.id));
+      await fetch(`${API}/customers/delete/${deletingUser.id}`, {
+        method: "DELETE",
+        credentials: "include", // This enables cookies to be sent with the request
+        headers: {
+          "Content-Type": "application/json",
+          // Optionally, include the Authorization header if you need the access token
+          Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+        },
+      });
+      setUsers(users.filter((user) => user.id !== deletingUser.id));
       toast({
         title: "User deleted",
         description: "በተሳካ ሁኔታ አባሉን አጥፍተዋል.",
@@ -84,13 +102,18 @@ export const AllUsers = () => {
   const handleUpdate = async () => {
     try {
       await fetch(`${API}/customers/update/${editUserId}`, {
-        method: 'PATCH',
+        method: "PATCH",
+        credentials: "include", // This enables cookies to be sent with the request
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+
         },
         body: JSON.stringify(updatedUser),
       });
-      setUsers(users.map(user => user.id === editUserId ? updatedUser : user));
+      setUsers(
+        users.map((user) => (user.id === editUserId ? updatedUser : user))
+      );
       toast({
         title: "User updated",
         description: "በተሳካ ሁኔታ መረጃውን ቀይረዋል.",
@@ -186,9 +209,14 @@ export const AllUsers = () => {
                     <td className="py-3">{index + 1}</td>
                     <td className="align-middle py-3">
                       {editUserId === user.id ? (
-                        <Input 
-                          value={updatedUser.Name} 
-                          onChange={(e) => setUpdatedUser({ ...updatedUser, Name: e.target.value })}
+                        <Input
+                          value={updatedUser.Name}
+                          onChange={(e) =>
+                            setUpdatedUser({
+                              ...updatedUser,
+                              Name: e.target.value,
+                            })
+                          }
                         />
                       ) : (
                         <div className="d-flex align-items-center">
@@ -203,9 +231,14 @@ export const AllUsers = () => {
                     </td>
                     <td className="py-3">
                       {editUserId === user.id ? (
-                        <Input 
-                          value={updatedUser.Phone} 
-                          onChange={(e) => setUpdatedUser({ ...updatedUser, Phone: e.target.value })}
+                        <Input
+                          value={updatedUser.Phone}
+                          onChange={(e) =>
+                            setUpdatedUser({
+                              ...updatedUser,
+                              Phone: e.target.value,
+                            })
+                          }
                         />
                       ) : (
                         user.Phone
@@ -213,9 +246,14 @@ export const AllUsers = () => {
                     </td>
                     <td className="py-3">
                       {editUserId === user.id ? (
-                        <Input 
-                          value={updatedUser.WorkingPlace} 
-                          onChange={(e) => setUpdatedUser({ ...updatedUser, WorkingPlace: e.target.value })}
+                        <Input
+                          value={updatedUser.WorkingPlace}
+                          onChange={(e) =>
+                            setUpdatedUser({
+                              ...updatedUser,
+                              WorkingPlace: e.target.value,
+                            })
+                          }
                         />
                       ) : (
                         user.WorkingPlace
@@ -223,9 +261,14 @@ export const AllUsers = () => {
                     </td>
                     <td className="py-3">
                       {editUserId === user.id ? (
-                        <Input 
-                          value={updatedUser.Gender} 
-                          onChange={(e) => setUpdatedUser({ ...updatedUser, Gender: e.target.value })}
+                        <Input
+                          value={updatedUser.Gender}
+                          onChange={(e) =>
+                            setUpdatedUser({
+                              ...updatedUser,
+                              Gender: e.target.value,
+                            })
+                          }
                         />
                       ) : (
                         user.Gender
@@ -233,13 +276,21 @@ export const AllUsers = () => {
                     </td>
                     <td className="py-3">
                       {editUserId === user.id ? (
-                        <Button colorScheme="blue" onClick={handleUpdate}>Save</Button>
+                        <Button colorScheme="blue" onClick={handleUpdate}>
+                          Save
+                        </Button>
                       ) : (
                         <div className="position-relative">
-                          <a className="link-dark d-inline-block mr-5" onClick={() => handleEdit(user)}>
+                          <a
+                            className="link-dark d-inline-block mr-5"
+                            onClick={() => handleEdit(user)}
+                          >
                             <i className="gd-pencil icon-text"></i>
                           </a>
-                          <a className="link-dark d-inline-block" onClick={() => openDeleteDialog(user)}>
+                          <a
+                            className="link-dark d-inline-block"
+                            onClick={() => openDeleteDialog(user)}
+                          >
                             <i className="gd-trash icon-text"></i>
                           </a>
                         </div>
@@ -264,7 +315,7 @@ export const AllUsers = () => {
                 </AlertDialogHeader>
 
                 <AlertDialogBody>
-                 እርግጠኛ ኖት ይህንን አባል ማጥፋት ይፈልጋሉ ?
+                  እርግጠኛ ኖት ይህንን አባል ማጥፋት ይፈልጋሉ ?
                 </AlertDialogBody>
 
                 <AlertDialogFooter>

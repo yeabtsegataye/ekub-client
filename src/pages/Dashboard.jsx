@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Spinner, useToast } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
 const API = import.meta.env.VITE_API_URL;
 
 export const Dashboard = () => {
@@ -8,12 +9,20 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const toast = useToast();
+  const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API}/categoray/get`); // Adjust the URL to your API
-        if (!response.ok) {
+        const response = await fetch(`${API}/categoray/get`, {
+          method: "GET",
+          credentials: "include", // This enables cookies to be sent with the request
+          headers: {
+            "Content-Type": "application/json",
+            // Optionally, include the Authorization header if you need the access token
+            Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+          },
+        });        if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
         const result = await response.json();

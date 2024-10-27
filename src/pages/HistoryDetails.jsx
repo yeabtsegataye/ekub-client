@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import { useParams, useLocation } from "react-router-dom";
 const API = import.meta.env.VITE_API_URL;
 
@@ -20,6 +21,7 @@ export const HistoryDetails = () => {
   const [showUserList, setShowUserList] = useState(false); // Toggle to show user list
   const [selectedUsers, setSelectedUsers] = useState([]); // Selected users to add to category
   const [users, setUsers] = useState([]); // State to hold fetched users
+  const token = useSelector((state) => state.auth.token);
 
   const addDay = () => setDays(days + 1);
 
@@ -32,7 +34,15 @@ export const HistoryDetails = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${API}/dates/get/${id}`); // Adjust the URL to your API
+        const response = await fetch(`${API}/dates/get/${id}`,{
+          method: "GET",
+          credentials: "include", // This enables cookies to be sent with the request
+          headers: {
+            "Content-Type": "application/json",
+            // Optionally, include the Authorization header if you need the access token
+            Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+          },
+        }); // Adjust the URL to your API
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -160,8 +170,11 @@ export const HistoryDetails = () => {
         `${API}/categoray/update/${id}`,
         {
           method: "PATCH",
+          credentials: "include", // This enables cookies to be sent with the request
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Replace 'yourAccessToken' with the actual token variable
+
           },
           body: JSON.stringify({
             IsCompleted: true, // Set isCompleted to true

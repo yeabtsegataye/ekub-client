@@ -5,17 +5,18 @@ import { useSelector } from "react-redux";
 const API = import.meta.env.VITE_API_URL;
 
 export const Setting = () => {
-    const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
 
   const toast = useToast();
   const [formData, setFormData] = useState({
-    email: user? user.email: "",
-    phone: user?user.phone: "",
+    email: user ? user.email : "",
+    phone: user ? user.phone : "",
     old_password: "",
     Password: "",
     password_confirm: "",
   });
-console.log(user,'user')
+  console.log(user, "user");
   // Handle input change
   const handleInputChange = (e) => {
     setFormData({
@@ -27,7 +28,7 @@ console.log(user,'user')
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-console.log(formData.Password, formData.password_confirm,'connff')
+    console.log(formData.Password, formData.password_confirm, "connff");
     // Check if new password matches confirm password
     if (formData.Password !== formData.password_confirm) {
       toast({
@@ -42,14 +43,25 @@ console.log(formData.Password, formData.password_confirm,'connff')
 
     // Prepare the data to be sent (exclude password_confirm)
     const dataToSend = {
-        email: formData.email,
+      email: formData.email,
       phone: formData.phone,
       old_password: formData.old_password,
       Password: formData.Password,
     };
 
     try {
-      const response = await axios.patch(`${API}/auth/update`, dataToSend);
+      const response = await axios.patch(
+        `${API}/auth/update`,
+        dataToSend, // Pass the data to send as the second argument
+        {
+          withCredentials: true, // Enable cookies to be sent with the request
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Replace 'token' with your actual access token variable
+          },
+        }
+      );
+      
 
       if (response.status === 200) {
         toast({
@@ -165,10 +177,7 @@ console.log(formData.Password, formData.password_confirm,'connff')
                     />
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  className="btn btn-primary float-right"
-                >
+                <button type="submit" className="btn btn-primary float-right">
                   ይቀይሩ
                 </button>
               </form>
