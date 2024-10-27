@@ -25,7 +25,7 @@ const verifyToken = async (token, dispatch, refresh) => {
         dispatch(logOut());
         throw error;
       }
-      // console.error("Error verifying token:", error.response.data);
+       console.error("Error verifying token:", error.response.data);
     }
   } else {
    return false

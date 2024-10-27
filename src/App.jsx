@@ -36,7 +36,7 @@ function App() {
   const verified = async () => {
     const Is_Verified = await verifyToken(token, dispatch, refresh);
     setIsVerified(Is_Verified);
-    // console.log(isVerified, 'for loging in')
+     console.log(isVerified, 'for loging in')
   };
   verified();
 
